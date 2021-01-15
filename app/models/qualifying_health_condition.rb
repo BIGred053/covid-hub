@@ -1,0 +1,2 @@
+class QualifyingHealthCondition < ApplicationRecord
+end

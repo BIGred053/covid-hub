@@ -1,0 +1,2 @@
+class DobVerification < ApplicationRecord
+end

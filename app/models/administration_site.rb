@@ -1,0 +1,2 @@
+class AdministrationSite < ApplicationRecord
+end

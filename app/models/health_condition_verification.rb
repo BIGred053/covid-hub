@@ -1,0 +1,2 @@
+class HealthConditionVerification < ApplicationRecord
+end

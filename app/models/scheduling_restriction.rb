@@ -1,0 +1,2 @@
+class SchedulingRestriction < ApplicationRecord
+end
