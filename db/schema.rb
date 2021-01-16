@@ -55,19 +55,23 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
   end
 
   create_table "dob_verifications", force: :cascade do |t|
+    t.bigint "registration_id"
     t.bigint "dob_verification_type_id"
     t.string "verifier_value"
     t.boolean "verified"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["dob_verification_type_id"], name: "index_dob_verifications_on_dob_verification_type_id"
+    t.index ["registration_id"], name: "index_dob_verifications_on_registration_id"
   end
 
   create_table "health_condition_verifications", force: :cascade do |t|
+    t.bigint "registration_id"
     t.boolean "verified"
     t.bigint "user_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_health_condition_verifications_on_registration_id"
     t.index ["user_id"], name: "index_health_condition_verifications_on_user_id"
   end
 
@@ -102,7 +106,6 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.string "patient_address_state"
     t.string "patient_address_zip"
     t.string "patient_dob"
-    t.bigint "dob_verification_id"
     t.string "provider_name"
     t.string "provider_address_street_1"
     t.string "provider_address_street_2"
@@ -111,7 +114,6 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.string "provider_address_zip"
     t.string "provider_phone_number"
     t.bigint "qualifying_health_condition_id"
-    t.bigint "health_condition_verification_id"
     t.string "contact_email"
     t.string "contact_phone"
     t.string "preferred_contact_method"
@@ -120,8 +122,6 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.boolean "transportation_assistance_needed"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["dob_verification_id"], name: "index_registrations_on_dob_verification_id"
-    t.index ["health_condition_verification_id"], name: "index_registrations_on_health_condition_verification_id"
     t.index ["qualifying_health_condition_id"], name: "index_registrations_on_qualifying_health_condition_id"
     t.index ["region_id"], name: "index_registrations_on_region_id"
     t.index ["registration_type_id"], name: "index_registrations_on_registration_type_id"

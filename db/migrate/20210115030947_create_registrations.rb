@@ -15,7 +15,6 @@ class CreateRegistrations < ActiveRecord::Migration[6.0]
       t.string :patient_address_zip
       
       t.string :patient_dob
-      t.references :dob_verification
 
       t.string :provider_name
       t.string :provider_address_street_1
@@ -26,7 +25,6 @@ class CreateRegistrations < ActiveRecord::Migration[6.0]
       t.string :provider_phone_number
 
       t.references :qualifying_health_condition
-      t.references :health_condition_verification
 
       t.string :contact_email
       t.string :contact_phone
