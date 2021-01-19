@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_15_035109) do
+ActiveRecord::Schema.define(version: 2021_01_19_045713) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -90,7 +90,7 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
   end
 
   create_table "registration_types", force: :cascade do |t|
-    t.string "type"
+    t.string "type_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
@@ -113,7 +113,6 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.string "provider_address_state"
     t.string "provider_address_zip"
     t.string "provider_phone_number"
-    t.bigint "qualifying_health_condition_id"
     t.string "contact_email"
     t.string "contact_phone"
     t.string "preferred_contact_method"
@@ -122,7 +121,7 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.boolean "transportation_assistance_needed"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["qualifying_health_condition_id"], name: "index_registrations_on_qualifying_health_condition_id"
+    t.boolean "qualifying_health_conditions"
     t.index ["region_id"], name: "index_registrations_on_region_id"
     t.index ["registration_type_id"], name: "index_registrations_on_registration_type_id"
   end
@@ -138,6 +137,15 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.index ["appointment_id_id"], name: "index_registrations_appointments_on_appointment_id_id"
     t.index ["appointment_type_id"], name: "index_registrations_appointments_on_appointment_type_id"
     t.index ["registration_id_id"], name: "index_registrations_appointments_on_registration_id_id"
+  end
+
+  create_table "registrations_states_qualifying_health_conditions", force: :cascade do |t|
+    t.bigint "registration_id"
+    t.bigint "states_qualifying_health_condition_id"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_reg_qualifying_health_conditions_on_registation_id"
+    t.index ["states_qualifying_health_condition_id"], name: "index_reg_qualifying_health_conditions_on_condition_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -163,6 +171,16 @@ ActiveRecord::Schema.define(version: 2021_01_15_035109) do
     t.string "name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "states_qualifying_health_conditions", force: :cascade do |t|
+    t.bigint "state_id"
+    t.bigint "qualifying_health_condition_id"
+    t.string "state_qualifier"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["qualifying_health_condition_id"], name: "index_states_qualifying_health_conditions_on_condition_id"
+    t.index ["state_id"], name: "index_states_qualifying_health_conditions_on_state_id"
   end
 
   create_table "users", force: :cascade do |t|
