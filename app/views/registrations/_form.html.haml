@@ -1,0 +1,88 @@
+= form_for @registration do |f|
+  - if @registration.errors.any?
+    %h2= "#{pluralize(@sale.errors.count, "error")} prohibited this sale from being saved:"
+    %ul
+      - @sale.errors.full_messages.each do |message|
+        %li
+          = message
+          \%
+  %h3 Registration for:
+  = f.collection_select :registration_type, @registration_types, :id, :type_name
+  %h3 Patient Information
+  = f.label "First and last name"
+  = f.text_field :patient_first_name, placeholder: "First Name"
+  = f.text_field :patient_last_name, placeholder: "Last Name"
+  %br/
+  %br/
+  = f.label "Address"
+  %br/
+  = f.text_field :patient_address_street_1
+  %br/
+  = f.text_field :patient_address_street_2
+  %br/
+  = f.text_field :patient_address_city, placeholder: "City"
+  = f.collection_select :patient_address_state, @all_states, :id, :name
+  = f.text_field :patient_address_zip, placeholder: "ZIP Code"
+  %br/
+  = f.label "Date of Birth"
+  = f.text_field :patient_dob, placeholder: "01/01/2020"
+  %h3 Who is your Primary Care Provider?
+  %small
+    Filling in this information can help us verify your information and health history to accurately prioritize your registration.
+    Additionally, through this information, your Primary Care Provider can accurately document your vaccination history.
+  %br/
+  = f.label "Provider Name"
+  = f.text_field :provider_name
+  %br/
+  %br/
+  = f.label "Provider Address"
+  %br/
+  = f.text_field :provider_address_street_1
+  %br/
+  = f.text_field :provider_address_street_2
+  %br/
+  = f.text_field :provider_address_city, placeholder: "City"
+  = f.collection_select :provider_address_state, @all_states, :id, :name
+  = f.text_field :provider_address_zip, placeholder: "ZIP Code"
+  %br/
+  %br/
+  = f.label "Provider Phone Number"
+  = f.text_field :provider_phone_number, placeholder: "555-555-5555"
+  %h3 Do You Have Any Qualifying Health Conditions?
+  %small
+    Depending on your state's vaccination plans, certain health conditions might qualify you for an earlier vaccine
+    distribution phase. Please select any of the following that apply.
+  %br/
+  - @qualifying_health_conditions.each do |condition|
+    = f.check_box :qualifying_health_conditions, {:multiple => true}, condition.id, nil
+    = "#{condition.state_qualifier}- #{condition.qualifying_health_condition.description}"
+    = f.label "#{condition.qualifying_health_condition.description}"
+    %br/
+  %h3 How Can We Reach You?
+  %small
+    This contact information will be used to clarify any questions about your registration, and to notify you when you
+    are eligible to schedule a vaccination appointment.
+  %br/
+  = f.label :contact_email
+  = f.text_field :contact_email, placeholder: "your_email@provider.com"
+  %br/
+  = f.label :contact_phone
+  = f.text_field :contact_phone, placeholder: "555-555-5555"
+  %br/
+  = f.radio_button :preferred_contact_method, "email", checked: @registration.preferred_contact_method == 'email'
+  Email
+  \#{f.radio_button :preferred_contact_method, "phone", checked: @registration.preferred_contact_method == 'phone'} Phone
+  %h3 HIPAA Consent
+  %p
+    In order to process your registration, confirm your provided information with your Primary Care Provider, and
+    share your information with the provider that will administer your vaccine, we need your permission that we can
+    share any information entered here with any health professionals associated with your Primary Care Practice and
+    any of the state-approved vaccine administration sites. Your infomration will not be otherwise shared without
+    your express written consent.
+  = f.check_box :hipaa_consented, {}, true, false
+  I Agree
+  %p
+    By entering your full legal name below, you confirm your consent to the above poliicy for sharing your Personal
+    Health Information with your identified Primary Care Provider and/or state-approved vaccination sites.
+  = f.text_field :signature
+  = f.submit "Register"
