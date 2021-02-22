@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_22_045028) do
+ActiveRecord::Schema.define(version: 2021_02_22_045036) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -30,6 +30,15 @@ ActiveRecord::Schema.define(version: 2021_02_22_045028) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["region_id"], name: "index_administration_sites_on_region_id"
+  end
+
+  create_table "answer_options", force: :cascade do |t|
+    t.bigint "question_id", null: false
+    t.string "display_text"
+    t.string "value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_answer_options_on_question_id"
   end
 
   create_table "appointment_types", force: :cascade do |t|
@@ -55,6 +64,43 @@ ActiveRecord::Schema.define(version: 2021_02_22_045028) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "question_types", force: :cascade do |t|
+    t.string "display_name"
+    t.string "associated_tag"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
+  create_table "questions", force: :cascade do |t|
+    t.text "prompt"
+    t.bigint "question_type_id", null: false
+    t.boolean "verification_required"
+    t.boolean "verification_preferred"
+    t.boolean "required_question"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_type_id"], name: "index_questions_on_question_type_id"
+  end
+
+  create_table "registration_consents", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.boolean "consented"
+    t.string "consent_signature"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_registration_consents_on_registration_id"
+  end
+
+  create_table "registration_data", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.bigint "question_id", null: false
+    t.string "value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_registration_data_on_question_id"
+    t.index ["registration_id"], name: "index_registration_data_on_registration_id"
+  end
+
   create_table "registration_forms", force: :cascade do |t|
     t.bigint "locality_id", null: false
     t.string "name"
@@ -62,6 +108,22 @@ ActiveRecord::Schema.define(version: 2021_02_22_045028) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["locality_id"], name: "index_registration_forms_on_locality_id"
+  end
+
+  create_table "registration_forms_questions", force: :cascade do |t|
+    t.bigint "registration_form_id", null: false
+    t.bigint "question_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_registration_forms_questions_on_question_id"
+    t.index ["registration_form_id"], name: "index_registration_forms_questions_on_registration_form_id"
+  end
+
+  create_table "registrations", force: :cascade do |t|
+    t.bigint "registration_form_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_form_id"], name: "index_registrations_on_registration_form_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -82,5 +144,27 @@ ActiveRecord::Schema.define(version: 2021_02_22_045028) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "verifications", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.bigint "registration_data_id", null: false
+    t.boolean "approved"
+    t.string "verification_method"
+    t.text "verification_media_filepath"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_data_id"], name: "index_verifications_on_registration_data_id"
+    t.index ["registration_id"], name: "index_verifications_on_registration_id"
+  end
+
+  add_foreign_key "answer_options", "questions"
+  add_foreign_key "questions", "question_types"
+  add_foreign_key "registration_consents", "registrations"
+  add_foreign_key "registration_data", "questions"
+  add_foreign_key "registration_data", "registrations"
   add_foreign_key "registration_forms", "localities"
+  add_foreign_key "registration_forms_questions", "questions"
+  add_foreign_key "registration_forms_questions", "registration_forms"
+  add_foreign_key "registrations", "registration_forms"
+  add_foreign_key "verifications", "registration_data", column: "registration_data_id"
+  add_foreign_key "verifications", "registrations"
 end
