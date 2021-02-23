@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_22_045036) do
+ActiveRecord::Schema.define(version: 2021_02_23_030027) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -136,6 +136,12 @@ ActiveRecord::Schema.define(version: 2021_02_22_045036) do
     t.index ["administration_site_id"], name: "index_schedules_on_administration_site_id"
   end
 
+  create_table "user_roles", force: :cascade do |t|
+    t.string "role_name"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "username"
     t.string "first_name"
@@ -146,6 +152,7 @@ ActiveRecord::Schema.define(version: 2021_02_22_045036) do
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
@@ -158,6 +165,8 @@ ActiveRecord::Schema.define(version: 2021_02_22_045036) do
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
     t.datetime "locked_at"
+    t.bigint "locality_id"
+    t.integer "user_role_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -185,6 +194,8 @@ ActiveRecord::Schema.define(version: 2021_02_22_045036) do
   add_foreign_key "registration_forms_questions", "questions"
   add_foreign_key "registration_forms_questions", "registration_forms"
   add_foreign_key "registrations", "registration_forms"
+  add_foreign_key "users", "localities"
+  add_foreign_key "users", "user_roles"
   add_foreign_key "verifications", "registration_data", column: "registration_data_id"
   add_foreign_key "verifications", "registrations"
 end
