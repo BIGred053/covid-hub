@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_02_10_034439) do
+ActiveRecord::Schema.define(version: 2021_02_23_030027) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -32,6 +32,15 @@ ActiveRecord::Schema.define(version: 2021_02_10_034439) do
     t.index ["region_id"], name: "index_administration_sites_on_region_id"
   end
 
+  create_table "answer_options", force: :cascade do |t|
+    t.bigint "question_id", null: false
+    t.string "display_text"
+    t.string "value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_answer_options_on_question_id"
+  end
+
   create_table "appointment_types", force: :cascade do |t|
     t.string "type"
     t.datetime "created_at", precision: 6, null: false
@@ -48,104 +57,73 @@ ActiveRecord::Schema.define(version: 2021_02_10_034439) do
     t.index ["schedule_id"], name: "index_appointments_on_schedule_id"
   end
 
-  create_table "dob_verification_types", force: :cascade do |t|
-    t.string "type"
+  create_table "localities", force: :cascade do |t|
+    t.string "name"
+    t.bigint "parent_locality_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "dob_verifications", force: :cascade do |t|
-    t.bigint "registration_id"
-    t.bigint "dob_verification_type_id"
-    t.string "verifier_value"
-    t.boolean "verified"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["dob_verification_type_id"], name: "index_dob_verifications_on_dob_verification_type_id"
-    t.index ["registration_id"], name: "index_dob_verifications_on_registration_id"
-  end
-
-  create_table "health_condition_verifications", force: :cascade do |t|
-    t.bigint "registration_id"
-    t.boolean "verified"
-    t.bigint "user_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["registration_id"], name: "index_health_condition_verifications_on_registration_id"
-    t.index ["user_id"], name: "index_health_condition_verifications_on_user_id"
-  end
-
-  create_table "qualifying_health_conditions", force: :cascade do |t|
-    t.string "description"
+  create_table "question_types", force: :cascade do |t|
+    t.string "display_name"
+    t.string "associated_tag"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end
 
-  create_table "regions", force: :cascade do |t|
-    t.bigint "state_id"
-    t.string "region_name"
+  create_table "questions", force: :cascade do |t|
+    t.text "prompt"
+    t.bigint "question_type_id", null: false
+    t.boolean "verification_required"
+    t.boolean "verification_preferred"
+    t.boolean "required_question"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["state_id"], name: "index_regions_on_state_id"
+    t.index ["question_type_id"], name: "index_questions_on_question_type_id"
   end
 
-  create_table "registration_types", force: :cascade do |t|
-    t.string "type_name"
+  create_table "registration_consents", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.boolean "consented"
+    t.string "consent_signature"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_id"], name: "index_registration_consents_on_registration_id"
+  end
+
+  create_table "registration_data", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.bigint "question_id", null: false
+    t.string "value"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_registration_data_on_question_id"
+    t.index ["registration_id"], name: "index_registration_data_on_registration_id"
+  end
+
+  create_table "registration_forms", force: :cascade do |t|
+    t.bigint "locality_id", null: false
+    t.string "name"
+    t.boolean "active"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["locality_id"], name: "index_registration_forms_on_locality_id"
+  end
+
+  create_table "registration_forms_questions", force: :cascade do |t|
+    t.bigint "registration_form_id", null: false
+    t.bigint "question_id", null: false
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["question_id"], name: "index_registration_forms_questions_on_question_id"
+    t.index ["registration_form_id"], name: "index_registration_forms_questions_on_registration_form_id"
   end
 
   create_table "registrations", force: :cascade do |t|
-    t.bigint "registration_type_id"
-    t.bigint "region_id"
-    t.string "patient_first_name"
-    t.string "patient_last_name"
-    t.string "patient_address_street_1"
-    t.string "patient_address_street_2"
-    t.string "patient_address_city"
-    t.string "patient_address_state"
-    t.string "patient_address_zip"
-    t.string "patient_dob"
-    t.string "provider_name"
-    t.string "provider_address_street_1"
-    t.string "provider_address_street_2"
-    t.string "provider_address_city"
-    t.string "provider_address_state"
-    t.string "provider_address_zip"
-    t.string "provider_phone_number"
-    t.string "contact_email"
-    t.string "contact_phone"
-    t.string "preferred_contact_method"
-    t.boolean "hipaa_consented"
-    t.string "signature"
-    t.boolean "transportation_assistance_needed"
+    t.bigint "registration_form_id", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.boolean "qualifying_health_conditions"
-    t.index ["region_id"], name: "index_registrations_on_region_id"
-    t.index ["registration_type_id"], name: "index_registrations_on_registration_type_id"
-  end
-
-  create_table "registrations_appointments", force: :cascade do |t|
-    t.bigint "registration_id_id"
-    t.bigint "appointment_id_id"
-    t.bigint "appointment_type_id"
-    t.string "vaccine_manufacturer"
-    t.boolean "patient_vaccinated"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["appointment_id_id"], name: "index_registrations_appointments_on_appointment_id_id"
-    t.index ["appointment_type_id"], name: "index_registrations_appointments_on_appointment_type_id"
-    t.index ["registration_id_id"], name: "index_registrations_appointments_on_registration_id_id"
-  end
-
-  create_table "registrations_states_qualifying_health_conditions", force: :cascade do |t|
-    t.bigint "registration_id"
-    t.bigint "states_qualifying_health_condition_id"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["registration_id"], name: "index_reg_qualifying_health_conditions_on_registation_id"
-    t.index ["states_qualifying_health_condition_id"], name: "index_reg_qualifying_health_conditions_on_condition_id"
+    t.index ["registration_form_id"], name: "index_registrations_on_registration_form_id"
   end
 
   create_table "schedules", force: :cascade do |t|
@@ -158,29 +136,10 @@ ActiveRecord::Schema.define(version: 2021_02_10_034439) do
     t.index ["administration_site_id"], name: "index_schedules_on_administration_site_id"
   end
 
-  create_table "scheduling_restrictions", force: :cascade do |t|
-    t.bigint "registration_id"
-    t.datetime "start_time"
-    t.datetime "end_time"
+  create_table "user_roles", force: :cascade do |t|
+    t.string "role_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["registration_id"], name: "index_scheduling_restrictions_on_registration_id"
-  end
-
-  create_table "states", force: :cascade do |t|
-    t.string "name"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-  end
-
-  create_table "states_qualifying_health_conditions", force: :cascade do |t|
-    t.bigint "state_id"
-    t.bigint "qualifying_health_condition_id"
-    t.string "state_qualifier"
-    t.datetime "created_at", precision: 6, null: false
-    t.datetime "updated_at", precision: 6, null: false
-    t.index ["qualifying_health_condition_id"], name: "index_states_qualifying_health_conditions_on_condition_id"
-    t.index ["state_id"], name: "index_states_qualifying_health_conditions_on_state_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -193,6 +152,7 @@ ActiveRecord::Schema.define(version: 2021_02_10_034439) do
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
+    t.datetime "remember_created_at"
     t.integer "sign_in_count", default: 0, null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
@@ -205,10 +165,37 @@ ActiveRecord::Schema.define(version: 2021_02_10_034439) do
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
     t.datetime "locked_at"
+    t.bigint "locality_id"
+    t.integer "user_role_id"
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
 
+  create_table "verifications", force: :cascade do |t|
+    t.bigint "registration_id", null: false
+    t.bigint "registration_data_id", null: false
+    t.boolean "approved"
+    t.string "verification_method"
+    t.text "verification_media_filepath"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["registration_data_id"], name: "index_verifications_on_registration_data_id"
+    t.index ["registration_id"], name: "index_verifications_on_registration_id"
+  end
+
+  add_foreign_key "answer_options", "questions"
+  add_foreign_key "questions", "question_types"
+  add_foreign_key "registration_consents", "registrations"
+  add_foreign_key "registration_data", "questions"
+  add_foreign_key "registration_data", "registrations"
+  add_foreign_key "registration_forms", "localities"
+  add_foreign_key "registration_forms_questions", "questions"
+  add_foreign_key "registration_forms_questions", "registration_forms"
+  add_foreign_key "registrations", "registration_forms"
+  add_foreign_key "users", "localities"
+  add_foreign_key "users", "user_roles"
+  add_foreign_key "verifications", "registration_data", column: "registration_data_id"
+  add_foreign_key "verifications", "registrations"
 end
