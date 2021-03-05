@@ -3,7 +3,12 @@ ohio = Locality.create(name: 'Ohio')
 Locality.create(name: 'Muskingum County', parent_locality_id: ohio.id)
 Locality.create(name: 'Franklin County', parent_locality_id: ohio.id)
 
-
+QuestionType.create(display_name: 'Short Response', associated_tag: 'input type="text"')
+QuestionType.create(display_name: 'Extended Response', associated_tag: 'textarea')
+QuestionType.create(display_name: 'Dropdown', associated_tag: 'select')
+QuestionType.create(display_name: 'Single-Choice Button', associated_tag: 'input type="radio"')
+QuestionType.create(display_name: 'Checkbox', associated_tag: 'input type="checkbox"')
+QuestionType.create(display_name: 'Date Picker', associated_tag: 'input type="date"')
 
 # Seed Ohio Phase 1B Health Conditions
 # QualifyingHealthCondition.create(description: 'Cerebral Palsy')
